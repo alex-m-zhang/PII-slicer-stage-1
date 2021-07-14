@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1525
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "PII-slicer-stage-1", "PII-slicer-stage-1\PII-slicer-stage-1.pyproj", "{E050FA8B-AA82-4A76-A553-5314EC6252CE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E050FA8B-AA82-4A76-A553-5314EC6252CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E050FA8B-AA82-4A76-A553-5314EC6252CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0B85D865-B6BC-4460-80A6-A88C74027F14}
+	EndGlobalSection
+EndGlobal
