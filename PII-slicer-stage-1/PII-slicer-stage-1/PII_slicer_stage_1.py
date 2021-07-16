@@ -98,11 +98,15 @@ for transcript in transcripts:
     audio_list.set_sample_width(original_sample_width)
     audio_list.set_frame_rate(original_frame_rate)
 
+    bitrate_to_use = str(int(int(original_bitrate) / 1000) * 1000)
+    #we use this bitrate because ffmpeg seems to like rounding up. If we use the actual original bitrate,
+    #   we'll end up about 1k over our original bitrate. This seems to fix the problem.
+
     #finally, export the audio
     if extension == "m4a": #for ffmpeg, use ipod instead of m4a
-        audio_list.export(output_folder_name + "/" + original_file_name, format="ipod", bitrate=original_bitrate)
+        audio_list.export(output_folder_name + "/" + original_file_name, format="ipod", bitrate=bitrate_to_use)
     else:
-        audio_list.export(output_folder_name + "/" + original_file_name, format=extension, bitrate=original_bitrate)
+        audio_list.export(output_folder_name + "/" + original_file_name, format=extension, bitrate=bitrate_to_use)
     end_timer = time.time()
     print(str(round(end_timer - start_timer, 2)) + " seconds to export. ")
 
