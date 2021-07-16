@@ -1,4 +1,5 @@
 from pydub import AudioSegment
+from pydub.utils import mediainfo
 import os
 import json
 import time
@@ -10,9 +11,6 @@ input_folder_name = "input_audio"
 output_folder_name = "output_audio"
 
 input_audio_names = os.listdir(input_folder_name)
-
-#load one second of silence
-silence = AudioSegment.from_file("silence_m4a.m4a")[:1000]
 
 #sort the files into transcripts and actual audio files
 transcripts = []
@@ -35,14 +33,20 @@ for transcript in transcripts:
             #create the audio list (and time how long it takes to import the audio file)
             start_timer = time.time()
             audio_list = AudioSegment.from_file(input_folder_name + "/" + file)
-            end_timer = time.time()
-            print(str(round(end_timer - start_timer, 2)) + " seconds to import. ")
 
-            #keep track of the original file name for saving purposes later..
+            #also store all the necessary original file information
+            original_channels = audio_list.channels
+            original_sample_width = audio_list.sample_width
+            original_frame_rate = audio_list.frame_rate
+            original_bitrate = mediainfo(input_folder_name + "/" + file)['bit_rate']
             original_file_name = file
-            #extension type is useful to calculate but not needed for now
+
+            #figure out extension type - it will always be the stuff after the last "."
             extension = file.split(".")
             extension = extension[-1]
+
+            end_timer = time.time()
+            print(str(round(end_timer - start_timer, 2)) + " seconds to import. ")
             break
     else:
         #no audio file found, don't want to do any processing
@@ -73,16 +77,11 @@ for transcript in transcripts:
             #part2 is the audio file from the end-cutting point to the end.
             part2 = audio_list[end_time:]
 
-            #calculate how many full seconds of silence is needed
-            full_silences = int(length / 1000)
-            #calculate how many parts of a full silence is needed to finish
-            silence_index = length % 1000
+            #generate silence with the same length as the length of the PII
+            silence = AudioSegment.silent(duration=length)
 
             #build the audio file
-            audio_list = part1
-            audio_list += silence * full_silences
-            audio_list += silence[:silence_index]
-            audio_list += part2
+            audio_list = part1 + silence + part2
 
     print(str(PII_count) + " PIIs found and removed. ")
     end_timer = time.time()
@@ -91,9 +90,19 @@ for transcript in transcripts:
     
     #print the length after processing (should be exact same as length before processing
     print("Postprocessing length: " + str(len(audio_list)) + "ms. ")
+
     start_timer = time.time()
-    #export the audio. The file format doesn't need to be specified.
-    audio_list.export(output_folder_name + "/" + original_file_name)
+    #export the audio.
+    #first, set the sample width, channel, etc. so that it is consistent with the original audio
+    audio_list.set_channels(original_channels)
+    audio_list.set_sample_width(original_sample_width)
+    audio_list.set_frame_rate(original_frame_rate)
+
+    #finally, export the audio
+    if extension == "m4a": #for ffmpeg, use ipod instead of m4a
+        audio_list.export(output_folder_name + "/" + original_file_name, format="ipod", bitrate=original_bitrate)
+    else:
+        audio_list.export(output_folder_name + "/" + original_file_name, format=extension, bitrate=original_bitrate)
     end_timer = time.time()
     print(str(round(end_timer - start_timer, 2)) + " seconds to export. ")
 
